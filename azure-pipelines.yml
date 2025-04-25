@@ -1,0 +1,26 @@
+jobs:
+- job: debricked_scan
+  displayName: Debricked scan
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    # - task: MavenAuthenticate@0
+    #   displayName: 'Maven Authenticate'
+    #   inputs:
+    #     artifactsFeeds: <your-private-repository-id>
+    # Uncomment the above lines if you need to authenticate private maven registries
+    # - task: NuGetAuthenticate@1
+    #   displayName: NuGet Authentication
+    # Uncomment the above lines if you need to authenticate private nuget registries
+    - script: |
+        python -m pip install -U conan
+        conan profile detect
+        conan config install https://github.com/conan-io/conan-extensions.git
+        python -m pip install 'cyclonedx-python-lib>=5.0.0,<6'
+        conan sbom:cyclonedx --format 1.4_json . > sbom.json
+    - script: |
+        curl -LsS https://github.com/debricked/cli/releases/download/release-v2/cli_linux_x86_64.tar.gz | tar -xz debricked
+        ./debricked scan
+      displayName: Debricked scan
+      env:
+        DEBRICKED_TOKEN: $(DEBRICKED_TOKEN)
