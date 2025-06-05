@@ -15,7 +15,9 @@ jobs:
           conan config install https://github.com/conan-io/conan-extensions.git
           python -m pip install 'cyclonedx-python-lib>=5.0.0,<6'
     - name: Generate Conan SBOM
-      run: conan sbom:cyclonedx --format 1.4_json .
+      run: |
+        conan sbom:cyclonedx --help
+        conan sbom:cyclonedx --format 1.4_json .
     - uses: debricked/actions@v4
       env:
         DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
